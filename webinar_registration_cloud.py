@@ -43,9 +43,16 @@ def get_google_sheet():
         
         # Open or create the spreadsheet
         try:
-            sheet = client.open("Webinar Registrations").worksheet("Registrations")
+            spreadsheet = client.open("Webinar Registrations")
+            try:
+                sheet = spreadsheet.worksheet("Registrations")
+            except gspread.WorksheetNotFound:
+                # Worksheet doesn't exist, create it
+                sheet = spreadsheet.add_worksheet("Registrations", rows=1000, cols=7)
+                headers = ["ID", "Webinar", "Email", "First Name", "Last Name", "Phone", "Registration Date"]
+                sheet.append_row(headers)
         except gspread.SpreadsheetNotFound:
-            # Create new spreadsheet if it doesn't exist
+            # Spreadsheet doesn't exist, create it
             spreadsheet = client.create("Webinar Registrations")
             sheet = spreadsheet.add_worksheet("Registrations", rows=1000, cols=7)
             
